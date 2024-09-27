@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const express = require("express");
 const app = express();
-
+const authController = require("./controllers/auth.js");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
 const morgan = require("morgan");
@@ -22,7 +22,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride("_method"));
 // Morgan for logging HTTP requests
 app.use(morgan('dev'));
+app.use("/auth", authController);
+
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);
+});
+
+// GET
+app.get("/", (req, res) => {
+    res.render("index.ejs");
 });
