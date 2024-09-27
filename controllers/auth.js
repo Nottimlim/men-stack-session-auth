@@ -22,6 +22,13 @@ router.get("/sign-up", async (req, res) => {
     const hashedPassword = bcrypt.hashSync(req.body.password, 10);
     req.body.password = hashedPassword;
     const user = await User.create(req.body);
+    req.session.user = {
+        username: user.username,
+      };
+      
+      req.session.save(() => {
+        res.redirect("/");
+      });      
     res.send(`Thanks for signing up ${user.username}`);
     
   });
