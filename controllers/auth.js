@@ -23,7 +23,7 @@ router.get("/sign-up", async (req, res) => {
     req.body.password = hashedPassword;
     const user = await User.create(req.body);
     req.session.user = {
-        username: user.username,
+        username: userInDatabase.username,
       };
       
       req.session.save(() => {
@@ -49,13 +49,14 @@ router.get("/sign-up", async (req, res) => {
     if (!validPassword) {
         return res.send("Login failed. Please try again.");
       }
-    req.session.user = {
+      req.session.user = {
         username: userInDatabase.username,
       };
       
-    req.session.save(() => {
+      req.session.save(() => {
         res.redirect("/");
       });
+      
       
 });
   

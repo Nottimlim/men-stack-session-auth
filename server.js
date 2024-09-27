@@ -8,6 +8,7 @@ const methodOverride = require("method-override");
 const morgan = require("morgan");
 const session = require('express-session');
 const MongoStore = require("connect-mongo");
+const isSignedIn = require("./middleware/is-signed-in.js");
 
 // Set the port from environment variable or default to 3000
 const port = process.env.PORT ? process.env.PORT : "3000";
@@ -23,14 +24,16 @@ app.use(express.urlencoded({ extended: false }));
 // Middleware for using HTTP verbs such as PUT or DELETE
 app.use(methodOverride("_method"));
 // Morgan for logging HTTP requests
+
 app.use(morgan('dev'));
+
 app.use(
     session({
       secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: true,
       store: MongoStore.create({
-        mongoUrl: process.env.MONGO_URI,
+        mongoUrl: process.env.MONGODB_URI,
       }),
     })
   );
@@ -48,12 +51,22 @@ app.get("/", (req, res) => {
       user: req.session.user,
     });
   });
-app.get("/vip-lounge", (req, res) => {
-    if (req.session.user) {
-      res.send(`Welcome to the party ${req.session.user.username}.`);
-    } else {
-      res.send("Sorry, no guests allowed.");
-    }
+app.use(
+    "/vip-lounge",
+    (req, res, next) => {
+      if (req.session.user) {
+        res.locals.user = req.session.user; // Store user info for use in the next function
+        next(); // Proceed to the next middleware or controller
+      } else {
+        res.redirect("/"); // Redirect unauthenticated users
+      }
+    },
+    // vipsController // The controller handling the '/vip-lounge' route
+  );
+  
+  app.get("/vip-lounge", isSignedIn, (req, res) => {
+    res.send(`Welcome to the party ${req.session.user.username}.`);
   });
+  
   
   
