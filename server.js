@@ -38,10 +38,17 @@ app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);
 });
 
-// GET
 app.get("/", (req, res) => {
     res.render("index.ejs", {
       user: req.session.user,
     });
   });
+app.get("/vip-lounge", (req, res) => {
+    if (req.session.user) {
+      res.send(`Welcome to the party ${req.session.user.username}.`);
+    } else {
+      res.send("Sorry, no guests allowed.");
+    }
+  });
+  
   
