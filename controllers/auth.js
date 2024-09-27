@@ -44,14 +44,17 @@ router.get("/sign-up", async (req, res) => {
       }
     req.session.user = {
         username: userInDatabase.username,
-        _id: userInDatabase._id
-    };
-    
-    res.redirect("/");
+      };
+      
+    req.session.save(() => {
+        res.redirect("/");
+      });
+      
 });
   
   router.get("/sign-out", (req, res) => {
-    req.session.destroy();
-    res.redirect("/");
-  });
-  
+    req.session.destroy(() => {
+        res.redirect("/");
+      })
+    });
+      
